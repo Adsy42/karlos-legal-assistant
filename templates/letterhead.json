@@ -1,0 +1,12 @@
+{
+  "firm_name": "Karlos Lawyers",
+  "abn": "12 345 678 901",
+  "address": "Level 3, 100 Collins Street, Melbourne VIC 3000",
+  "phone": "(03) 9555 1234",
+  "fax": "(03) 9555 1235",
+  "email": "info@karloslawyers.com.au",
+  "website": "www.karloslawyers.com.au",
+  "dx": "DX 123 Melbourne",
+  "practitioner": { "name": "Mandy", "title": "Senior Associate", "phone": "(03) 9555 1236", "email": "mandy@karloslawyers.com.au" },
+  "principal": { "name": "[Principal Name]", "title": "Principal" }
+}

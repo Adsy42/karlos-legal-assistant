@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Karlos Lawyers Document Extract",
+  "type": "object",
+  "required": ["source_file", "extracted_at", "extraction_version", "document_type", "total_pages"],
+  "properties": {
+    "source_file": { "type": "string" },
+    "original_filename": { "type": ["string", "null"] },
+    "extracted_at": { "type": "string", "format": "date-time" },
+    "extraction_version": { "type": "integer", "minimum": 1 },
+    "re_extract_reason": { "type": ["string", "null"] },
+    "document_type": { "type": "string", "enum": ["treating_gp_report", "treating_specialist_report", "ime_report", "radiology_report", "hospital_records", "psych_report", "certificate_of_capacity", "insurer_decision", "insurer_correspondence", "employer_correspondence", "wage_records", "surveillance_report", "conciliation_outcome", "medical_panel_opinion", "court_document", "client_statement", "other"] },
+    "total_pages": { "type": "integer" },
+    "client_seen_date": { "type": ["string", "null"], "format": "date" },
+    "author": {
+      "type": ["object", "null"],
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": ["string", "null"] },
+        "specialty": { "type": ["string", "null"] },
+        "organisation": { "type": ["string", "null"] }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "pages": { "type": "string" },
+          "summary": { "type": "string" }
+        }
+      }
+    },
+    "diagnoses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "condition": { "type": "string" },
+          "body_part": { "type": ["string", "null"] },
+          "side": { "type": ["string", "null"], "enum": [null, "left", "right", "bilateral", "na"] },
+          "type": { "type": "string", "enum": ["physical", "psychological"] }
+        }
+      }
+    },
+    "causation_opinion": {
+      "type": ["object", "null"],
+      "properties": {
+        "related_to_injury": { "type": "string", "enum": ["yes", "no", "partially", "not_assessed"] },
+        "detail": { "type": ["string", "null"] },
+        "page": { "type": ["integer", "null"] }
+      }
+    },
+    "clinical_findings": { "type": "array", "items": { "type": "string" } },
+    "work_capacity": {
+      "type": ["object", "null"],
+      "properties": {
+        "current": { "type": ["string", "null"], "enum": [null, "no_current_capacity", "partial_suitable_duties", "partial_pre_injury_duties", "full_suitable_duties", "full_pre_injury_duties", "not_assessed"] },
+        "detail": { "type": ["string", "null"] },
+        "expected_return": { "type": ["string", "null"] },
+        "page": { "type": ["integer", "null"] }
+      }
+    },
+    "treatment": {
+      "type": ["object", "null"],
+      "properties": {
+        "current": { "type": ["string", "null"] },
+        "recommended": { "type": ["string", "null"] },
+        "surgery_recommended": { "type": ["boolean", "null"] }
+      }
+    },
+    "prognosis": {
+      "type": ["object", "null"],
+      "properties": {
+        "summary": { "type": ["string", "null"] },
+        "mmi_reached": { "type": ["boolean", "null"] },
+        "estimated_mmi_date": { "type": ["string", "null"], "format": "date" },
+        "page": { "type": ["integer", "null"] }
+      }
+    },
+    "impairment": {
+      "type": ["object", "null"],
+      "properties": {
+        "assessed": { "type": "boolean" },
+        "wpi_rating": { "type": ["number", "null"] },
+        "method": { "type": ["string", "null"] },
+        "detail": { "type": ["string", "null"] },
+        "page": { "type": ["integer", "null"] }
+      }
+    },
+    "decision": {
+      "type": ["object", "null"],
+      "properties": {
+        "type": { "type": "string", "enum": ["accept", "reject", "terminate", "partial_accept", "vary", "other"] },
+        "date": { "type": ["string", "null"], "format": "date" },
+        "reasons": { "type": ["string", "null"] },
+        "appeal_rights": { "type": ["string", "null"] },
+        "response_deadline": { "type": ["string", "null"], "format": "date" }
+      }
+    },
+    "key_quotes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "quote": { "type": "string" },
+          "context": { "type": ["string", "null"] },
+          "page": { "type": ["integer", "null"] },
+          "section": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "flags": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "enum": ["adverse_finding", "contradicts_existing", "surveillance_reference", "pre_existing_condition", "causation_dispute", "capacity_dispute", "impairment_below_threshold", "mmi_not_reached", "treatment_disputed", "missing_information", "unusual_finding"] },
+          "detail": { "type": "string" },
+          "severity": { "type": "string", "enum": ["critical", "high", "normal", "low"] },
+          "contradicts_file": { "type": ["string", "null"] },
+          "action_required": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "chronology_entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string", "format": "date" },
+          "type": { "type": "string", "enum": ["injury", "treatment", "assessment", "surgery", "hospitalisation", "investigation", "decision", "return_to_work", "capacity_change", "other"] },
+          "source": { "type": "string" },
+          "source_file": { "type": "string" },
+          "body_part": { "type": ["string", "null"] },
+          "findings": { "type": ["string", "null"] },
+          "diagnosis": { "type": ["string", "null"] },
+          "work_capacity": { "type": ["string", "null"] },
+          "treatment": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "notes": { "type": ["string", "null"] }
+  }
+}

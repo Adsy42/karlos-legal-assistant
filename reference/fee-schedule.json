@@ -1,0 +1,19 @@
+{
+  "fee_arrangements": {
+    "speculative": { "percentage": 25, "gst": true, "applies_to": ["workcover","tac","public_liability"], "description": "No win, no fee. 25% of settlement." },
+    "standard": { "hourly_rate_senior": 450, "hourly_rate_principal": 550, "gst": true, "applies_to": ["tpd"] },
+    "scale_costs": { "basis": "County Court Scale", "gst": true }
+  },
+  "common_disbursements": [
+    {"item":"GP report","typical":350,"gst":false},
+    {"item":"Specialist report","typical":1500,"gst":false},
+    {"item":"Psychiatric report","typical":2500,"gst":false},
+    {"item":"Radiology","typical":200,"gst":false},
+    {"item":"Hospital records","typical":150,"gst":false},
+    {"item":"Barrister conference","typical":3000,"gst":true},
+    {"item":"Barrister court","typical":5000,"gst":true},
+    {"item":"Court filing","typical":800,"gst":false},
+    {"item":"FCE","typical":2000,"gst":false},
+    {"item":"Vocational assessment","typical":1500,"gst":false}
+  ]
+}

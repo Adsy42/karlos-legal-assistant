@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Karlos Lawyers Matter",
+  "type": "object",
+  "required": ["matter_id", "claim_type", "stage", "status", "created_at", "client", "dates"],
+  "properties": {
+    "matter_id": { "type": "string", "pattern": "^(WC|TAC|PL|TPD|CL)-\\d{4}-\\d{3}$" },
+    "claim_type": { "type": "string", "enum": ["workcover", "tac", "public_liability", "tpd", "common_law"] },
+    "stage": { "type": "string", "enum": ["intake", "claim_lodged", "awaiting_insurer_decision", "insurer_accepted", "insurer_rejected", "benefits_terminated", "conciliation_pending", "conciliation_completed", "serious_injury_pending", "medical_panel_referred", "common_law_elected", "litigation", "settlement_negotiation", "settled", "closed_successful", "closed_unsuccessful", "withdrawn"] },
+    "sub_stage": { "type": ["string", "null"], "enum": [null, "awaiting_documents", "awaiting_client_instructions", "awaiting_medical_report", "awaiting_insurer_response", "awaiting_conciliation_date", "awaiting_panel_date", "awaiting_court_date", "drafting_submissions", "negotiating", "costs_assessment"] },
+    "status": { "type": "string", "enum": ["active", "closed", "archived"] },
+    "created_at": { "type": "string", "format": "date" },
+    "client": {
+      "type": "object", "required": ["full_name"],
+      "properties": {
+        "full_name": { "type": "string" },
+        "date_of_birth": { "type": ["string", "null"], "format": "date" },
+        "address": { "type": ["string", "null"] },
+        "phone": { "type": ["string", "null"] },
+        "email": { "type": ["string", "null"] },
+        "preferred_contact": { "type": ["string", "null"], "enum": [null, "phone", "email", "post", "sms"] },
+        "interpreter_needed": { "type": "boolean", "default": false },
+        "interpreter_language": { "type": ["string", "null"] }
+      }
+    },
+    "dates": {
+      "type": "object",
+      "properties": {
+        "date_of_injury": { "type": ["string", "null"], "format": "date" },
+        "date_of_claim": { "type": ["string", "null"], "format": "date" },
+        "date_instructed": { "type": ["string", "null"], "format": "date" },
+        "notice_of_involvement_sent": { "type": ["string", "null"], "format": "date" },
+        "insurer_decision_date": { "type": ["string", "null"], "format": "date" },
+        "conciliation_application_date": { "type": ["string", "null"], "format": "date" },
+        "conciliation_date": { "type": ["string", "null"], "format": "date" },
+        "conciliation_outcome_date": { "type": ["string", "null"], "format": "date" },
+        "serious_injury_application_date": { "type": ["string", "null"], "format": "date" },
+        "common_law_election_date": { "type": ["string", "null"], "format": "date" },
+        "proceedings_issued_date": { "type": ["string", "null"], "format": "date" },
+        "settlement_date": { "type": ["string", "null"], "format": "date" },
+        "limitation_expiry": { "type": ["string", "null"], "format": "date" },
+        "costs_disclosure_date": { "type": ["string", "null"], "format": "date" },
+        "costs_disclosure_updated": { "type": ["string", "null"], "format": "date" }
+      }
+    },
+    "injury": {
+      "type": "object",
+      "properties": {
+        "mechanism": { "type": ["string", "null"] },
+        "body_parts": { "type": "array", "items": { "type": "object", "properties": { "part": {"type":"string"}, "side": {"type":["string","null"],"enum":[null,"left","right","bilateral","na"]}, "type": {"type":"string","enum":["physical","psychological"]}, "diagnosis": {"type":["string","null"]}, "wpi": {"type":["number","null"]} } } },
+        "work_capacity": { "type": ["string", "null"], "enum": [null, "no_current_capacity", "partial_suitable_duties", "partial_pre_injury_duties", "full_suitable_duties", "full_pre_injury_duties", "not_assessed"] },
+        "coc_current": { "type": "boolean", "default": false },
+        "coc_expiry": { "type": ["string", "null"], "format": "date" },
+        "coc_doctor": { "type": ["string", "null"] }
+      }
+    },
+    "employer": { "type": ["object", "null"], "properties": { "name": {"type":"string"}, "contact_name": {"type":["string","null"]}, "phone": {"type":["string","null"]}, "email": {"type":["string","null"]}, "address": {"type":["string","null"]} } },
+    "insurer": { "type": ["object", "null"], "properties": { "name": {"type":"string"}, "agent_name": {"type":["string","null"],"enum":[null,"Allianz","CGU","EML","Gallagher Bassett","QBE","Xchanging","Other"]}, "claim_number": {"type":["string","null"]}, "contact_name": {"type":["string","null"]}, "phone": {"type":["string","null"]}, "email": {"type":["string","null"]}, "address": {"type":["string","null"]} } },
+    "tac_specific": { "type": ["object", "null"], "properties": { "tac_claim_number": {"type":["string","null"]}, "accident_type": {"type":["string","null"],"enum":[null,"driver","passenger","pedestrian","cyclist","motorcyclist","pillion"]}, "at_fault": {"type":["boolean","null"]}, "impairment_threshold_met": {"type":["boolean","null"]} } },
+    "tpd_specific": { "type": ["object", "null"], "properties": { "fund_name": {"type":["string","null"]}, "fund_trustee": {"type":["string","null"]}, "policy_number": {"type":["string","null"]}, "insurer_name": {"type":["string","null"]}, "definition_type": {"type":["string","null"],"enum":[null,"own_occupation","any_occupation","activities_of_daily_living"]}, "waiting_period_months": {"type":["integer","null"]}, "benefit_amount": {"type":["number","null"]} } },
+    "parties": { "type": "array", "items": { "type": "object", "required": ["role","name"], "properties": { "role": {"type":"string","enum":["client","employer","insurer","insurer_agent","treating_gp","treating_specialist","treating_psychologist","treating_physio","ime","barrister","employer_solicitor","respondent"]}, "name": {"type":"string"}, "organisation": {"type":["string","null"]}, "specialty": {"type":["string","null"]}, "phone": {"type":["string","null"]}, "email": {"type":["string","null"]}, "address": {"type":["string","null"]} } } },
+    "deadlines": { "type": "array", "items": { "type": "object", "required": ["type","due_date","status"], "properties": { "type": {"type":"string","enum":["limitation_period","insurer_decision","conciliation_application","conciliation_hearing","serious_injury_application","common_law_election","medical_panel_response","court_filing","court_hearing","discovery_compliance","coc_renewal","treatment_approval_response","section_114_request","impairment_benefit_claim","costs_disclosure","custom"]}, "name": {"type":["string","null"]}, "due_date": {"type":"string","format":"date"}, "status": {"type":"string","enum":["pending","imminent","overdue","met","expired","waived"]}, "legislative_basis": {"type":["string","null"]}, "triggered_by": {"type":["string","null"]}, "trigger_date": {"type":["string","null"],"format":"date"}, "consequence": {"type":["string","null"]} } } },
+    "documents": { "type": "array", "items": { "type": "object", "required": ["filename"], "properties": { "filename": {"type":"string"}, "original_filename": {"type":["string","null"]}, "document_type": {"type":"string"}, "document_date": {"type":["string","null"],"format":"date"}, "author": {"type":["string","null"]}, "analysed": {"type":"boolean","default":false}, "extract_version": {"type":["integer","null"]}, "date_added": {"type":"string","format":"date"} } } },
+    "letters": { "type": "array", "items": { "type": "object", "required": ["filename","letter_type","status"], "properties": { "filename": {"type":"string"}, "letter_type": {"type":"string"}, "recipient": {"type":"string"}, "recipient_role": {"type":["string","null"]}, "status": {"type":"string","enum":["draft","approved","sent","superseded"]}, "date_created": {"type":"string","format":"date"}, "date_approved": {"type":["string","null"],"format":"date"}, "date_sent": {"type":["string","null"],"format":"date"}, "sent_via": {"type":["string","null"],"enum":[null,"email","post","manual"]}, "version": {"type":"integer","default":1}, "supersedes": {"type":["string","null"]} } } },
+    "financials": { "type": "object", "properties": { "estimated_value": {"type":["number","null"]}, "fee_percentage": {"type":["number","null"]}, "fee_type": {"type":["string","null"],"enum":[null,"speculative","standard","no_win_no_fee","hybrid","scale_costs"]}, "settlement_amount": {"type":["number","null"]}, "net_to_client": {"type":["number","null"]}, "disbursements": {"type":"array","items":{"type":"object","properties":{"description":{"type":"string"},"amount":{"type":"number"},"date":{"type":["string","null"],"format":"date"},"gst_applicable":{"type":"boolean","default":true},"paid":{"type":"boolean","default":false}}}} } },
+    "compliance": { "type": "object", "properties": { "conflict_check_done": {"type":"boolean","default":false}, "conflict_check_date": {"type":["string","null"],"format":"date"}, "conflict_check_result": {"type":["string","null"],"enum":[null,"clear","flagged_proceed","flagged_declined"]}, "costs_disclosure_sent": {"type":"boolean","default":false}, "costs_disclosure_date": {"type":["string","null"],"format":"date"}, "costs_disclosure_updated": {"type":"boolean","default":false}, "authority_to_release_signed": {"type":"boolean","default":false}, "retainer_signed": {"type":"boolean","default":false} } },
+    "notes": { "type": ["string", "null"] }
+  }
+}

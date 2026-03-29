@@ -1,0 +1,8 @@
+matters/
+!matters/.gitkeep
+feedback/
+!feedback/.gitkeep
+logs/
+!logs/.gitkeep
+*.enc
+.DS_Store

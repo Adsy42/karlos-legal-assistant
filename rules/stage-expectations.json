@@ -1,0 +1,115 @@
+{
+  "version": "1.0",
+  "description": "Soft workflow expectations per stage. Miss = matter drifts, not claim destroyed.",
+  "stages": {
+    "intake": {
+      "expected_actions": [
+        { "action": "conflict_check", "description": "Run conflict check", "expected_within_days": 0 },
+        { "action": "engagement_retainer", "description": "Send engagement/retainer letter", "expected_within_days": 3 },
+        { "action": "costs_disclosure", "description": "Send initial costs disclosure", "expected_within_days": 7 },
+        { "action": "authority_to_release", "description": "Obtain signed authority to release", "expected_within_days": 7 },
+        { "action": "notice_of_involvement", "description": "Send notice of involvement to insurer (WC/TAC)", "expected_within_days": 3, "applies_to": ["workcover", "tac"] }
+      ],
+      "auto_advance": { "to": "claim_lodged", "when": "notice_of_involvement sent AND claim lodged" }
+    },
+    "claim_lodged": {
+      "expected_actions": [
+        { "action": "confirm_receipt", "description": "Confirm insurer received claim", "expected_within_days": 7 },
+        { "action": "gather_medical", "description": "Request treating doctor reports", "expected_within_days": 14 }
+      ],
+      "auto_advance": { "to": "awaiting_insurer_decision", "when": "insurer acknowledges receipt" }
+    },
+    "awaiting_insurer_decision": {
+      "expected_actions": [
+        { "action": "monitor_28_day", "description": "Track 28-day insurer decision deadline (WC)", "expected_within_days": 28, "applies_to": ["workcover"] },
+        { "action": "client_update", "description": "Update client on progress", "expected_within_days": 14 }
+      ],
+      "auto_advance": { "to": "insurer_accepted OR insurer_rejected", "when": "insurer decision received" }
+    },
+    "insurer_accepted": {
+      "expected_actions": [
+        { "action": "confirm_payments", "description": "Confirm weekly payments commenced", "expected_within_days": 7, "applies_to": ["workcover"] },
+        { "action": "treatment_approval", "description": "Submit treatment approval requests", "expected_within_days": 14 },
+        { "action": "coc_check", "description": "Check Certificate of Capacity is current", "expected_within_days": 7, "applies_to": ["workcover"] },
+        { "action": "client_update", "description": "Advise client of acceptance", "expected_within_days": 3 }
+      ]
+    },
+    "insurer_rejected": {
+      "expected_actions": [
+        { "action": "client_advice", "description": "Advise client of rejection and options", "expected_within_days": 3 },
+        { "action": "conciliation_decision", "description": "Decide on conciliation application", "expected_within_days": 14 },
+        { "action": "conciliation_application", "description": "Lodge conciliation application (60-day deadline)", "expected_within_days": 45, "applies_to": ["workcover"] }
+      ],
+      "auto_advance": { "to": "conciliation_pending", "when": "conciliation application filed" }
+    },
+    "benefits_terminated": {
+      "expected_actions": [
+        { "action": "review_termination", "description": "Review termination grounds", "expected_within_days": 3 },
+        { "action": "client_advice", "description": "Advise client of termination and options", "expected_within_days": 3 },
+        { "action": "conciliation_decision", "description": "Decide on conciliation", "expected_within_days": 14 }
+      ],
+      "auto_advance": { "to": "conciliation_pending", "when": "conciliation application filed" }
+    },
+    "conciliation_pending": {
+      "expected_actions": [
+        { "action": "gather_documents", "description": "Compile all medical and wage evidence", "expected_within_days": 14 },
+        { "action": "pre_conciliation_submission", "description": "Prepare pre-conciliation submission", "expected_within_days": 21 },
+        { "action": "client_prep", "description": "Prepare client for conciliation", "expected_within_days": 7 },
+        { "action": "chronology", "description": "Build/update medical chronology", "expected_within_days": 14 }
+      ],
+      "auto_advance": { "to": "conciliation_completed", "when": "conciliation outcome received" }
+    },
+    "conciliation_completed": {
+      "expected_actions": [
+        { "action": "record_outcome", "description": "Record conciliation outcome", "expected_within_days": 1 },
+        { "action": "client_advice", "description": "Advise client of outcome and next steps", "expected_within_days": 3 },
+        { "action": "next_steps", "description": "Determine pathway (medical panel, serious injury, accept)", "expected_within_days": 7 }
+      ]
+    },
+    "serious_injury_pending": {
+      "expected_actions": [
+        { "action": "medical_evidence", "description": "Obtain comprehensive medical evidence", "expected_within_days": 30 },
+        { "action": "narrative_preparation", "description": "Prepare serious injury narrative", "expected_within_days": 60 },
+        { "action": "barrister_brief", "description": "Brief barrister for application", "expected_within_days": 45 }
+      ]
+    },
+    "medical_panel_referred": {
+      "expected_actions": [
+        { "action": "prepare_client", "description": "Prepare client for panel examination", "expected_within_days": 14 },
+        { "action": "review_questions", "description": "Review panel questions and prepare submissions", "expected_within_days": 14 }
+      ]
+    },
+    "common_law_elected": {
+      "expected_actions": [
+        { "action": "confirm_election", "description": "Confirm election is irrevocable", "expected_within_days": 1 },
+        { "action": "evidence_gathering", "description": "Commence comprehensive evidence gathering", "expected_within_days": 30 },
+        { "action": "liability_assessment", "description": "Assess liability and quantum", "expected_within_days": 60 }
+      ],
+      "auto_advance": { "to": "litigation", "when": "proceedings issued" }
+    },
+    "litigation": {
+      "expected_actions": [
+        { "action": "comply_directions", "description": "Comply with court directions", "expected_within_days": 14 },
+        { "action": "discovery", "description": "Complete discovery obligations", "expected_within_days": 30 },
+        { "action": "mediation_prep", "description": "Prepare for mediation/settlement conference", "expected_within_days": 30 }
+      ],
+      "auto_advance": { "to": "settlement_negotiation", "when": "settlement discussions commence" }
+    },
+    "settlement_negotiation": {
+      "expected_actions": [
+        { "action": "costs_disclosure_update", "description": "Update costs disclosure (s184 LPUL)", "expected_within_days": 0 },
+        { "action": "settlement_financials", "description": "Prepare settlement financial statement", "expected_within_days": 3 },
+        { "action": "client_authority", "description": "Obtain client authority to settle", "expected_within_days": 7 }
+      ],
+      "auto_advance": { "to": "settled", "when": "settlement agreement reached" }
+    },
+    "settled": {
+      "expected_actions": [
+        { "action": "settlement_deed", "description": "Prepare/review settlement deed", "expected_within_days": 7 },
+        { "action": "final_sfs", "description": "Prepare final settlement financial statement", "expected_within_days": 7 },
+        { "action": "client_reporting", "description": "Send final reporting letter", "expected_within_days": 14 }
+      ],
+      "auto_advance": { "to": "closed_successful", "when": "settlement completed and funds distributed" }
+    }
+  }
+}

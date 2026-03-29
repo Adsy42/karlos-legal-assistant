@@ -1,0 +1,3 @@
+**By name:** "notice of involvement" → insurer/notice-of-involvement.md | "treatment dispute" → insurer/treatment-rejection-dispute.md | "doctor report" → doctor/treating-practitioner-report.md | "retainer" → client/engagement-retainer.md | etc.
+**By context (what just happened):** new matter → notice + retainer | IME with adverse → ime-response | rejection → treatment-rejection-dispute or conciliation-application | stage to insurer_rejected → client/insurer-decision-advice | approaching conciliation → pre-conciliation + client prep | settlement → SFS
+**Ambiguous:** present grouped list by recipient.

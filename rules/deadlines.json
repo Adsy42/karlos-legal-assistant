@@ -1,0 +1,36 @@
+{
+  "version": "1.0",
+  "jurisdiction": "Victoria, Australia",
+  "last_reviewed": "2026-03-28",
+  "rules": {
+    "workcover": [
+      { "id": "wc_limitation", "name": "Limitation period — common law", "trigger_event": "date_of_injury", "period_years": 3, "special_calc": "3 years from DOI, or 3 years from date of knowledge. Minors: from 18th birthday. Extension under s134AB(26) WIRC Act.", "legislative_basis": "Limitation of Actions Act 1958 s5(1AA); WIRC Act 2013 s134AB(26)", "consequence": "Common law claim statute-barred.", "severity": "critical", "applies_to": "common_law_pathway" },
+      { "id": "wc_insurer_decision", "name": "Insurer decision on claim", "trigger_event": "date_of_claim", "period_days": 28, "special_calc": "28 days from properly made claim. Not decided → deemed accepted s103(2).", "legislative_basis": "WIRC Act 2013 s103", "consequence": "Claim deemed accepted.", "severity": "normal" },
+      { "id": "wc_conciliation_application", "name": "Conciliation application", "trigger_event": "insurer_decision_date", "period_days": 60, "special_calc": "60 days from rejection/termination. No extension.", "legislative_basis": "WIRC Act 2013 s257", "consequence": "Right to WIC conciliation lost.", "severity": "high" },
+      { "id": "wc_weekly_13wk", "name": "Payment rate reduction — 13 weeks", "trigger_event": "first_weekly_payment_date", "period_weeks": 13, "special_calc": "Rate drops from 95% to 80% of PIAWE.", "legislative_basis": "WIRC Act 2013 s165", "consequence": "Automatic rate reduction.", "severity": "normal" },
+      { "id": "wc_weekly_52wk", "name": "Payment rate — 52 weeks", "trigger_event": "first_weekly_payment_date", "period_weeks": 52, "special_calc": "Must demonstrate capacity. Second entitlement period s167.", "legislative_basis": "WIRC Act 2013 s167", "consequence": "Payments may cease without capacity evidence.", "severity": "high" },
+      { "id": "wc_weekly_130wk", "name": "Payments cessation — 130 weeks", "trigger_event": "first_weekly_payment_date", "period_weeks": 130, "special_calc": "Cease unless no current work capacity AND likely indefinite.", "legislative_basis": "WIRC Act 2013 s168", "consequence": "Payments cease.", "severity": "critical" },
+      { "id": "wc_serious_injury", "name": "Serious injury application", "trigger_event": "date_of_injury", "period_years": 6, "special_calc": "6 years. Narrative test s134AB(38).", "legislative_basis": "WIRC Act 2013 s134AB(16)-(38)", "consequence": "Cannot proceed to common law.", "severity": "high" },
+      { "id": "wc_impairment_benefit", "name": "Impairment benefit claim", "trigger_event": "mmi_date", "period_years": 6, "special_calc": "After MMI. Min 10% WPI. AMA 4th Ed.", "legislative_basis": "WIRC Act 2013 ss98A-98D", "consequence": "Lose lump sum entitlement.", "severity": "high" },
+      { "id": "wc_coc_renewal", "name": "CoC renewal", "trigger_event": "coc_expiry", "period_days": -7, "special_calc": "Request 7 days before expiry. Gap suspends payments.", "legislative_basis": "WIRC Act 2013 s110(1)", "consequence": "Weekly payments suspended.", "severity": "high" }
+    ],
+    "tac": [
+      { "id": "tac_limitation", "name": "Limitation period — common law", "trigger_event": "date_of_injury", "period_years": 3, "special_calc": "3 years from accident. Minors: from 18th birthday.", "legislative_basis": "Limitation of Actions Act 1958 s5(1AAA); TAC Act 1986 s93(1)", "consequence": "Common law claim statute-barred.", "severity": "critical" },
+      { "id": "tac_no_fault", "name": "No-fault benefit claim", "trigger_event": "date_of_injury", "period_years": 1, "special_calc": "12 months. Late: TAC discretion.", "legislative_basis": "Transport Accident Act 1986 s37", "consequence": "No-fault benefits refused.", "severity": "high" },
+      { "id": "tac_serious_injury", "name": "Serious injury certificate", "trigger_event": "date_of_injury", "period_years": 6, "special_calc": "Alternative to impairment threshold. Narrative test.", "legislative_basis": "Transport Accident Act 1986 s93(4)", "consequence": "Cannot proceed to common law.", "severity": "high" }
+    ],
+    "public_liability": [
+      { "id": "pl_limitation", "name": "Limitation period", "trigger_event": "date_of_injury", "period_years": 3, "special_calc": "3 years from cause of action. Discoverability s27D. Extension s27K.", "legislative_basis": "Limitation of Actions Act 1958 s5(1AA); Wrongs Act 1958 Part VBA", "consequence": "Claim statute-barred.", "severity": "critical" },
+      { "id": "pl_longstop", "name": "Long-stop limitation", "trigger_event": "date_of_injury", "period_years": 12, "special_calc": "Absolute 12-year limit regardless of discoverability.", "legislative_basis": "Limitation of Actions Act 1958 s27K", "consequence": "Absolutely barred.", "severity": "critical" },
+      { "id": "pl_significant_injury", "name": "Significant injury threshold", "trigger_event": "date_of_injury", "period_years": 6, "special_calc": "Narrative test s28LE Wrongs Act.", "legislative_basis": "Wrongs Act 1958 ss28LE-28LF", "consequence": "Cannot claim non-economic loss.", "severity": "high" }
+    ],
+    "tpd": [
+      { "id": "tpd_limitation", "name": "Limitation period", "trigger_event": "date_of_disablement", "period_years": 6, "special_calc": "6 years (contract). Check fund deed for internal deadlines (often 12-24mo).", "legislative_basis": "Limitation of Actions Act 1958 s5(1)(a)", "consequence": "Claim time-barred.", "severity": "critical" },
+      { "id": "tpd_waiting", "name": "Waiting period", "trigger_event": "date_of_disablement", "period_months": 3, "special_calc": "Most policies 3 or 6 months off work. Check policy.", "legislative_basis": "Fund-specific", "consequence": "Cannot lodge before expiry.", "severity": "normal" }
+    ],
+    "compliance": [
+      { "id": "costs_initial", "name": "Initial costs disclosure", "trigger_event": "date_instructed", "period_days": 7, "special_calc": "ASAP after instructions. Before substantial work.", "legislative_basis": "Legal Profession Uniform Law ss174-177", "consequence": "Costs agreement unenforceable.", "severity": "high" },
+      { "id": "costs_settlement", "name": "Pre-settlement costs disclosure", "trigger_event": "settlement_offer_date", "period_days": 0, "special_calc": "Before client agrees to settlement.", "legislative_basis": "Legal Profession Uniform Law s184", "consequence": "Settlement voidable. Conduct risk.", "severity": "critical" }
+    ]
+  }
+}

@@ -1,7 +1,7 @@
 {
-  "version": "1.0",
-  "jurisdiction": "Victoria, Australia",
-  "last_reviewed": "2026-03-28",
+  "version": "2.0",
+  "jurisdiction": "Victoria, Australia (+ Federal for Comcare)",
+  "last_reviewed": "2026-03-31",
   "rules": {
     "workcover": [
       { "id": "wc_limitation", "name": "Limitation period — common law", "trigger_event": "date_of_injury", "period_years": 3, "special_calc": "3 years from DOI, or 3 years from date of knowledge. Minors: from 18th birthday. Extension under s134AB(26) WIRC Act.", "legislative_basis": "Limitation of Actions Act 1958 s5(1AA); WIRC Act 2013 s134AB(26)", "consequence": "Common law claim statute-barred.", "severity": "critical", "applies_to": "common_law_pathway" },
@@ -27,6 +27,19 @@
     "tpd": [
       { "id": "tpd_limitation", "name": "Limitation period", "trigger_event": "date_of_disablement", "period_years": 6, "special_calc": "6 years (contract). Check fund deed for internal deadlines (often 12-24mo).", "legislative_basis": "Limitation of Actions Act 1958 s5(1)(a)", "consequence": "Claim time-barred.", "severity": "critical" },
       { "id": "tpd_waiting", "name": "Waiting period", "trigger_event": "date_of_disablement", "period_months": 3, "special_calc": "Most policies 3 or 6 months off work. Check policy.", "legislative_basis": "Fund-specific", "consequence": "Cannot lodge before expiry.", "severity": "normal" }
+    ],
+    "comcare": [
+      { "id": "com_limitation", "name": "Limitation period — common law", "trigger_event": "date_of_injury", "period_years": 3, "special_calc": "3 years from date of injury or knowledge. Must elect under s44 SRC Act. Threshold: 10% WPI.", "legislative_basis": "Limitation of Actions Act 1958 s5(1AA); SRC Act 1988 s44", "consequence": "Common law claim statute-barred.", "severity": "critical" },
+      { "id": "com_determination", "name": "Comcare liability determination", "trigger_event": "date_of_claim", "period_months": 6, "special_calc": "Comcare should determine within 6 months. No deemed acceptance — chase actively.", "legislative_basis": "SRC Act 1988 s61", "consequence": "Delay only — no deemed acceptance.", "severity": "normal" },
+      { "id": "com_reconsideration", "name": "Reconsideration application", "trigger_event": "determination_date", "period_days": 30, "special_calc": "30 days from date of determination. Internal review under s62.", "legislative_basis": "SRC Act 1988 s62", "consequence": "Must proceed directly to AAT without internal review.", "severity": "high" },
+      { "id": "com_aat", "name": "AAT application", "trigger_event": "reconsideration_date", "period_days": 60, "special_calc": "60 days from reconsideration decision.", "legislative_basis": "SRC Act 1988 s64; AAT Act 1975", "consequence": "Lose right of external review.", "severity": "high" },
+      { "id": "com_permanent_impairment", "name": "Permanent impairment claim", "trigger_event": "mmi_date", "period_years": 3, "special_calc": "After MMI. 10% WPI threshold for lump sum.", "legislative_basis": "SRC Act 1988 s24", "consequence": "Lose lump sum entitlement.", "severity": "high" }
+    ],
+    "medical_negligence": [
+      { "id": "mn_limitation", "name": "Limitation period", "trigger_event": "date_of_injury", "period_years": 3, "special_calc": "3 years from discoverability (s27D Limitation Act). NOT necessarily from treatment date. Date patient knew or ought to have known.", "legislative_basis": "Limitation of Actions Act 1958 s5(1AA), s27D", "consequence": "Claim statute-barred.", "severity": "critical" },
+      { "id": "mn_longstop", "name": "Long-stop limitation", "trigger_event": "date_of_injury", "period_years": 12, "special_calc": "Absolute 12-year limit regardless of discoverability.", "legislative_basis": "Limitation of Actions Act 1958 s27K", "consequence": "Absolutely barred.", "severity": "critical" },
+      { "id": "mn_pre_court_response", "name": "Pre-court notice response period", "trigger_event": "pre_court_notice_date", "period_days": 90, "special_calc": "Defendant has 90 days to respond to pre-court notice. Cannot issue proceedings before expiry unless urgent.", "legislative_basis": "Wrongs Act 1958 Part VBA", "consequence": "Can proceed to issue proceedings.", "severity": "normal" },
+      { "id": "mn_significant_injury", "name": "Significant injury threshold", "trigger_event": "date_of_injury", "period_years": 6, "special_calc": "Narrative test s28LE Wrongs Act. Same as public liability.", "legislative_basis": "Wrongs Act 1958 ss28LE-28LF", "consequence": "Cannot claim non-economic loss.", "severity": "high" }
     ],
     "compliance": [
       { "id": "costs_initial", "name": "Initial costs disclosure", "trigger_event": "date_instructed", "period_days": 7, "special_calc": "ASAP after instructions. Before substantial work.", "legislative_basis": "Legal Profession Uniform Law ss174-177", "consequence": "Costs agreement unenforceable.", "severity": "high" },

@@ -4,14 +4,81 @@
   "type": "object",
   "required": ["matter_id", "claim_type", "stage", "status", "created_at", "client", "dates"],
   "properties": {
-    "matter_id": { "type": "string", "pattern": "^(WC|TAC|PL|TPD|CL)-\\d{4}-\\d{3}$" },
-    "claim_type": { "type": "string", "enum": ["workcover", "tac", "public_liability", "tpd", "common_law"] },
-    "stage": { "type": "string", "enum": ["intake", "claim_lodged", "awaiting_insurer_decision", "insurer_accepted", "insurer_rejected", "benefits_terminated", "conciliation_pending", "conciliation_completed", "serious_injury_pending", "medical_panel_referred", "common_law_elected", "litigation", "settlement_negotiation", "settled", "closed_successful", "closed_unsuccessful", "withdrawn"] },
-    "sub_stage": { "type": ["string", "null"], "enum": [null, "awaiting_documents", "awaiting_client_instructions", "awaiting_medical_report", "awaiting_insurer_response", "awaiting_conciliation_date", "awaiting_panel_date", "awaiting_court_date", "drafting_submissions", "negotiating", "costs_assessment"] },
-    "status": { "type": "string", "enum": ["active", "closed", "archived"] },
+    "matter_id": {
+      "type": "string",
+      "pattern": "^((WC|TAC|PL|TPD|CL|COM|MN)-\\d{4}-\\d{3}|\\d{2}:\\d{4})$",
+      "description": "Accepts both system-generated (WC-2026-012) and Smokeball (24:0707) formats"
+    },
+    "smokeball_id": {
+      "type": ["string", "null"],
+      "description": "Original Smokeball matter number if imported"
+    },
+    "claim_type": {
+      "type": "string",
+      "enum": ["workcover", "tac", "public_liability", "tpd", "common_law", "comcare", "medical_negligence"]
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "initial_review",
+        "intake",
+        "claim_lodged",
+        "awaiting_insurer_decision",
+        "insurer_accepted",
+        "insurer_rejected",
+        "benefits_terminated",
+        "conciliation_pending",
+        "conciliation_completed",
+        "serious_injury_pending",
+        "medical_panel_referred",
+        "common_law_pre_litigation",
+        "common_law_elected",
+        "litigation",
+        "settlement_negotiation",
+        "settled",
+        "closed_successful",
+        "closed_unsuccessful",
+        "withdrawn"
+      ]
+    },
+    "sub_stage": {
+      "type": ["string", "null"],
+      "enum": [
+        null,
+        "awaiting_documents",
+        "awaiting_client_instructions",
+        "awaiting_medical_report",
+        "awaiting_insurer_response",
+        "awaiting_conciliation_date",
+        "awaiting_panel_date",
+        "awaiting_court_date",
+        "awaiting_trial",
+        "awaiting_defendant_response",
+        "drafting_submissions",
+        "negotiating",
+        "costs_assessment",
+        "expert_report_pending",
+        "pre_court_notice_served",
+        "reconsideration_pending",
+        "aat_review"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "on_hold", "closed", "archived"]
+    },
     "created_at": { "type": "string", "format": "date" },
+    "assigned_to": {
+      "type": ["object", "null"],
+      "properties": {
+        "primary": { "type": "string", "description": "Initials or name of primary solicitor (e.g., MJ)" },
+        "assisting": { "type": ["string", "null"], "description": "Initials or name of assisting solicitor (e.g., HT)" },
+        "conduct_date": { "type": ["string", "null"], "format": "date", "description": "Date conduct was taken/transferred" }
+      }
+    },
     "client": {
-      "type": "object", "required": ["full_name"],
+      "type": "object",
+      "required": ["full_name"],
       "properties": {
         "full_name": { "type": "string" },
         "date_of_birth": { "type": ["string", "null"], "format": "date" },
@@ -20,13 +87,19 @@
         "email": { "type": ["string", "null"] },
         "preferred_contact": { "type": ["string", "null"], "enum": [null, "phone", "email", "post", "sms"] },
         "interpreter_needed": { "type": "boolean", "default": false },
-        "interpreter_language": { "type": ["string", "null"] }
+        "interpreter_language": { "type": ["string", "null"] },
+        "occupation": { "type": ["string", "null"] }
       }
     },
     "dates": {
       "type": "object",
       "properties": {
         "date_of_injury": { "type": ["string", "null"], "format": "date" },
+        "date_of_injury_approximate": { "type": "boolean", "default": false },
+        "date_of_injury_description": {
+          "type": ["string", "null"],
+          "description": "Original date description if approximate, e.g., 'April/May 2024' or 'Approx. Jan-Mar 2025'"
+        },
         "date_of_claim": { "type": ["string", "null"], "format": "date" },
         "date_instructed": { "type": ["string", "null"], "format": "date" },
         "notice_of_involvement_sent": { "type": ["string", "null"], "format": "date" },
@@ -40,30 +113,327 @@
         "settlement_date": { "type": ["string", "null"], "format": "date" },
         "limitation_expiry": { "type": ["string", "null"], "format": "date" },
         "costs_disclosure_date": { "type": ["string", "null"], "format": "date" },
-        "costs_disclosure_updated": { "type": ["string", "null"], "format": "date" }
+        "costs_disclosure_updated": { "type": ["string", "null"], "format": "date" },
+        "pre_court_notice_date": { "type": ["string", "null"], "format": "date" },
+        "determination_date": { "type": ["string", "null"], "format": "date" },
+        "reconsideration_date": { "type": ["string", "null"], "format": "date" }
       }
     },
     "injury": {
       "type": "object",
       "properties": {
         "mechanism": { "type": ["string", "null"] },
-        "body_parts": { "type": "array", "items": { "type": "object", "properties": { "part": {"type":"string"}, "side": {"type":["string","null"],"enum":[null,"left","right","bilateral","na"]}, "type": {"type":"string","enum":["physical","psychological"]}, "diagnosis": {"type":["string","null"]}, "wpi": {"type":["number","null"]} } } },
-        "work_capacity": { "type": ["string", "null"], "enum": [null, "no_current_capacity", "partial_suitable_duties", "partial_pre_injury_duties", "full_suitable_duties", "full_pre_injury_duties", "not_assessed"] },
+        "body_parts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "part": { "type": "string" },
+              "side": { "type": ["string", "null"], "enum": [null, "left", "right", "bilateral", "na"] },
+              "type": { "type": "string", "enum": ["physical", "psychological"] },
+              "diagnosis": { "type": ["string", "null"] },
+              "wpi": { "type": ["number", "null"] },
+              "aggravation": { "type": "boolean", "default": false, "description": "Whether this is an aggravation of pre-existing condition" }
+            }
+          }
+        },
+        "pre_existing_conditions": {
+          "type": ["array", "null"],
+          "items": { "type": "string" },
+          "description": "Known pre-existing conditions relevant to the claim"
+        },
+        "work_capacity": {
+          "type": ["string", "null"],
+          "enum": [null, "no_current_capacity", "partial_suitable_duties", "partial_pre_injury_duties", "full_suitable_duties", "full_pre_injury_duties", "not_assessed"]
+        },
         "coc_current": { "type": "boolean", "default": false },
         "coc_expiry": { "type": ["string", "null"], "format": "date" },
         "coc_doctor": { "type": ["string", "null"] }
       }
     },
-    "employer": { "type": ["object", "null"], "properties": { "name": {"type":"string"}, "contact_name": {"type":["string","null"]}, "phone": {"type":["string","null"]}, "email": {"type":["string","null"]}, "address": {"type":["string","null"]} } },
-    "insurer": { "type": ["object", "null"], "properties": { "name": {"type":"string"}, "agent_name": {"type":["string","null"],"enum":[null,"Allianz","CGU","EML","Gallagher Bassett","QBE","Xchanging","Other"]}, "claim_number": {"type":["string","null"]}, "contact_name": {"type":["string","null"]}, "phone": {"type":["string","null"]}, "email": {"type":["string","null"]}, "address": {"type":["string","null"]} } },
-    "tac_specific": { "type": ["object", "null"], "properties": { "tac_claim_number": {"type":["string","null"]}, "accident_type": {"type":["string","null"],"enum":[null,"driver","passenger","pedestrian","cyclist","motorcyclist","pillion"]}, "at_fault": {"type":["boolean","null"]}, "impairment_threshold_met": {"type":["boolean","null"]} } },
-    "tpd_specific": { "type": ["object", "null"], "properties": { "fund_name": {"type":["string","null"]}, "fund_trustee": {"type":["string","null"]}, "policy_number": {"type":["string","null"]}, "insurer_name": {"type":["string","null"]}, "definition_type": {"type":["string","null"],"enum":[null,"own_occupation","any_occupation","activities_of_daily_living"]}, "waiting_period_months": {"type":["integer","null"]}, "benefit_amount": {"type":["number","null"]} } },
-    "parties": { "type": "array", "items": { "type": "object", "required": ["role","name"], "properties": { "role": {"type":"string","enum":["client","employer","insurer","insurer_agent","treating_gp","treating_specialist","treating_psychologist","treating_physio","ime","barrister","employer_solicitor","respondent"]}, "name": {"type":"string"}, "organisation": {"type":["string","null"]}, "specialty": {"type":["string","null"]}, "phone": {"type":["string","null"]}, "email": {"type":["string","null"]}, "address": {"type":["string","null"]} } } },
-    "deadlines": { "type": "array", "items": { "type": "object", "required": ["type","due_date","status"], "properties": { "type": {"type":"string","enum":["limitation_period","insurer_decision","conciliation_application","conciliation_hearing","serious_injury_application","common_law_election","medical_panel_response","court_filing","court_hearing","discovery_compliance","coc_renewal","treatment_approval_response","section_114_request","impairment_benefit_claim","costs_disclosure","custom"]}, "name": {"type":["string","null"]}, "due_date": {"type":"string","format":"date"}, "status": {"type":"string","enum":["pending","imminent","overdue","met","expired","waived"]}, "legislative_basis": {"type":["string","null"]}, "triggered_by": {"type":["string","null"]}, "trigger_date": {"type":["string","null"],"format":"date"}, "consequence": {"type":["string","null"]} } } },
-    "documents": { "type": "array", "items": { "type": "object", "required": ["filename"], "properties": { "filename": {"type":"string"}, "original_filename": {"type":["string","null"]}, "document_type": {"type":"string"}, "document_date": {"type":["string","null"],"format":"date"}, "author": {"type":["string","null"]}, "analysed": {"type":"boolean","default":false}, "extract_version": {"type":["integer","null"]}, "date_added": {"type":"string","format":"date"} } } },
-    "letters": { "type": "array", "items": { "type": "object", "required": ["filename","letter_type","status"], "properties": { "filename": {"type":"string"}, "letter_type": {"type":"string"}, "recipient": {"type":"string"}, "recipient_role": {"type":["string","null"]}, "status": {"type":"string","enum":["draft","approved","sent","superseded"]}, "date_created": {"type":"string","format":"date"}, "date_approved": {"type":["string","null"],"format":"date"}, "date_sent": {"type":["string","null"],"format":"date"}, "sent_via": {"type":["string","null"],"enum":[null,"email","post","manual"]}, "version": {"type":"integer","default":1}, "supersedes": {"type":["string","null"]} } } },
-    "financials": { "type": "object", "properties": { "estimated_value": {"type":["number","null"]}, "fee_percentage": {"type":["number","null"]}, "fee_type": {"type":["string","null"],"enum":[null,"speculative","standard","no_win_no_fee","hybrid","scale_costs"]}, "settlement_amount": {"type":["number","null"]}, "net_to_client": {"type":["number","null"]}, "disbursements": {"type":"array","items":{"type":"object","properties":{"description":{"type":"string"},"amount":{"type":"number"},"date":{"type":["string","null"],"format":"date"},"gst_applicable":{"type":"boolean","default":true},"paid":{"type":"boolean","default":false}}}} } },
-    "compliance": { "type": "object", "properties": { "conflict_check_done": {"type":"boolean","default":false}, "conflict_check_date": {"type":["string","null"],"format":"date"}, "conflict_check_result": {"type":["string","null"],"enum":[null,"clear","flagged_proceed","flagged_declined"]}, "costs_disclosure_sent": {"type":"boolean","default":false}, "costs_disclosure_date": {"type":["string","null"],"format":"date"}, "costs_disclosure_updated": {"type":"boolean","default":false}, "authority_to_release_signed": {"type":"boolean","default":false}, "retainer_signed": {"type":"boolean","default":false} } },
-    "notes": { "type": ["string", "null"] }
+    "employers": {
+      "type": ["array", "null"],
+      "description": "Supports multi-employer (labour-hire, host, occupier). Replaces singular 'employer' field.",
+      "items": {
+        "type": "object",
+        "required": ["name", "role"],
+        "properties": {
+          "name": { "type": "string" },
+          "role": {
+            "type": "string",
+            "enum": ["direct_employer", "labour_hire", "host_employer", "occupier", "self_insured", "principal_contractor"]
+          },
+          "contact_name": { "type": ["string", "null"] },
+          "phone": { "type": ["string", "null"] },
+          "email": { "type": ["string", "null"] },
+          "address": { "type": ["string", "null"] },
+          "abn": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "insurer": {
+      "type": ["object", "null"],
+      "properties": {
+        "name": { "type": "string" },
+        "agent_name": {
+          "type": ["string", "null"],
+          "enum": [null, "Allianz", "CGU", "DXC", "EML", "Gallagher Bassett", "QBE", "Xchanging", "Other"],
+          "description": "WorkSafe agent. Null for self-insured, TAC, Comcare, etc."
+        },
+        "self_insured": { "type": "boolean", "default": false },
+        "claim_number": { "type": ["string", "null"] },
+        "contact_name": { "type": ["string", "null"] },
+        "phone": { "type": ["string", "null"] },
+        "email": { "type": ["string", "null"] },
+        "address": { "type": ["string", "null"] }
+      }
+    },
+    "tac_specific": {
+      "type": ["object", "null"],
+      "properties": {
+        "tac_claim_number": { "type": ["string", "null"] },
+        "accident_type": { "type": ["string", "null"], "enum": [null, "driver", "passenger", "pedestrian", "cyclist", "motorcyclist", "pillion"] },
+        "at_fault": { "type": ["boolean", "null"] },
+        "impairment_threshold_met": { "type": ["boolean", "null"] },
+        "other_driver_name": { "type": ["string", "null"] },
+        "other_driver_rego": { "type": ["string", "null"] },
+        "police_attended": { "type": ["boolean", "null"] },
+        "accident_location": { "type": ["string", "null"] },
+        "client_vehicle_rego": { "type": ["string", "null"] }
+      }
+    },
+    "tpd_specific": {
+      "type": ["object", "null"],
+      "properties": {
+        "fund_name": { "type": ["string", "null"] },
+        "fund_trustee": { "type": ["string", "null"] },
+        "policy_number": { "type": ["string", "null"] },
+        "insurer_name": { "type": ["string", "null"] },
+        "definition_type": { "type": ["string", "null"], "enum": [null, "own_occupation", "any_occupation", "activities_of_daily_living"] },
+        "waiting_period_months": { "type": ["integer", "null"] },
+        "benefit_amount": { "type": ["number", "null"] }
+      }
+    },
+    "comcare_specific": {
+      "type": ["object", "null"],
+      "properties": {
+        "commonwealth_employer": { "type": ["string", "null"] },
+        "comcare_claim_number": { "type": ["string", "null"] },
+        "licensee": { "type": ["string", "null"], "description": "If employer is a licensed self-insurer (e.g., Australia Post)" },
+        "determination_outcome": { "type": ["string", "null"], "enum": [null, "accepted", "rejected", "partially_accepted"] },
+        "reconsideration_outcome": { "type": ["string", "null"], "enum": [null, "affirmed", "varied", "revoked", "pending"] },
+        "aat_status": { "type": ["string", "null"], "enum": [null, "filed", "pending_hearing", "decided", "not_required"] }
+      }
+    },
+    "medical_negligence_specific": {
+      "type": ["object", "null"],
+      "properties": {
+        "treating_facility": { "type": ["string", "null"] },
+        "treating_practitioner": { "type": ["string", "null"] },
+        "practitioner_specialty": { "type": ["string", "null"] },
+        "alleged_negligence_summary": { "type": ["string", "null"] },
+        "expert_liability_obtained": { "type": "boolean", "default": false },
+        "expert_liability_author": { "type": ["string", "null"] },
+        "pre_court_notice_served": { "type": "boolean", "default": false },
+        "pre_court_notice_response_due": { "type": ["string", "null"], "format": "date" },
+        "defendant_insurer": { "type": ["string", "null"], "description": "Medical indemnity insurer (e.g., VMIA for public hospitals)" }
+      }
+    },
+    "serious_injury": {
+      "type": ["object", "null"],
+      "properties": {
+        "certificate_held": { "type": "boolean", "default": false },
+        "application_date": { "type": ["string", "null"], "format": "date" },
+        "outcome": { "type": ["string", "null"], "enum": [null, "granted", "refused", "pending", "not_required"] },
+        "heads_granted": { "type": ["string", "null"], "enum": [null, "pain_and_suffering", "pecuniary", "both"] },
+        "legislative_basis": { "type": ["string", "null"] }
+      }
+    },
+    "court_proceedings": {
+      "type": ["object", "null"],
+      "properties": {
+        "court": {
+          "type": ["string", "null"],
+          "enum": [null, "magistrates_court", "county_court", "supreme_court", "federal_court", "vcat", "aat"]
+        },
+        "proceeding_number": { "type": ["string", "null"] },
+        "filed_date": { "type": ["string", "null"], "format": "date" },
+        "next_hearing_date": { "type": ["string", "null"], "format": "date" },
+        "next_hearing_type": {
+          "type": ["string", "null"],
+          "enum": [null, "mention", "special_mention", "directions", "trial", "mediation", "settlement_conference", "costs_hearing", "interlocutory"]
+        },
+        "trial_date": { "type": ["string", "null"], "format": "date" },
+        "defendant_solicitors": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "object",
+            "properties": {
+              "firm": { "type": "string" },
+              "solicitor_name": { "type": ["string", "null"] },
+              "for_defendant": { "type": ["string", "null"], "description": "Which defendant this firm acts for" }
+            }
+          }
+        },
+        "counsel_briefed": { "type": ["string", "null"], "description": "Name of barrister briefed" },
+        "discovery_status": {
+          "type": ["string", "null"],
+          "enum": [null, "not_commenced", "affidavit_pending", "affidavit_filed", "completed"]
+        }
+      }
+    },
+    "parties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["role", "name"],
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "client", "employer", "host_employer", "labour_hire_employer", "occupier",
+              "insurer", "insurer_agent", "self_insured_employer",
+              "treating_gp", "treating_specialist", "treating_psychologist", "treating_physio", "treating_psychiatrist",
+              "ime", "expert_witness",
+              "barrister", "defendant_solicitor", "employer_solicitor", "respondent",
+              "conciliation_officer", "comcare", "tac",
+              "other_driver", "witness"
+            ]
+          },
+          "name": { "type": "string" },
+          "organisation": { "type": ["string", "null"] },
+          "specialty": { "type": ["string", "null"] },
+          "phone": { "type": ["string", "null"] },
+          "email": { "type": ["string", "null"] },
+          "address": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "deadlines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "due_date", "status"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "limitation_period", "insurer_decision", "conciliation_application", "conciliation_hearing",
+              "serious_injury_application", "common_law_election", "medical_panel_response",
+              "court_filing", "court_hearing", "court_mention", "trial",
+              "discovery_compliance", "interrogatories", "affidavit_of_documents",
+              "coc_renewal", "treatment_approval_response", "section_114_request",
+              "impairment_benefit_claim", "costs_disclosure",
+              "settlement_offer_response", "pre_court_notice_response",
+              "reconsideration", "aat_application",
+              "defendant_response", "fbp_response",
+              "custom"
+            ]
+          },
+          "name": { "type": ["string", "null"] },
+          "due_date": { "type": "string", "format": "date" },
+          "status": { "type": "string", "enum": ["pending", "imminent", "overdue", "met", "expired", "waived"] },
+          "legislative_basis": { "type": ["string", "null"] },
+          "triggered_by": { "type": ["string", "null"] },
+          "trigger_date": { "type": ["string", "null"], "format": "date" },
+          "consequence": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["filename"],
+        "properties": {
+          "filename": { "type": "string" },
+          "original_filename": { "type": ["string", "null"] },
+          "document_type": { "type": "string" },
+          "document_date": { "type": ["string", "null"], "format": "date" },
+          "author": { "type": ["string", "null"] },
+          "analysed": { "type": "boolean", "default": false },
+          "extract_version": { "type": ["integer", "null"] },
+          "date_added": { "type": "string", "format": "date" }
+        }
+      }
+    },
+    "letters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["filename", "letter_type", "status"],
+        "properties": {
+          "filename": { "type": "string" },
+          "letter_type": { "type": "string" },
+          "recipient": { "type": "string" },
+          "recipient_role": { "type": ["string", "null"] },
+          "status": { "type": "string", "enum": ["draft", "approved", "sent", "superseded"] },
+          "date_created": { "type": "string", "format": "date" },
+          "date_approved": { "type": ["string", "null"], "format": "date" },
+          "date_sent": { "type": ["string", "null"], "format": "date" },
+          "sent_via": { "type": ["string", "null"], "enum": [null, "email", "post", "manual"] },
+          "version": { "type": "integer", "default": 1 },
+          "supersedes": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "financials": {
+      "type": "object",
+      "properties": {
+        "estimated_value": { "type": ["number", "null"] },
+        "fee_percentage": { "type": ["number", "null"] },
+        "fee_type": { "type": ["string", "null"], "enum": [null, "speculative", "standard", "no_win_no_fee", "hybrid", "scale_costs"] },
+        "settlement_amount": { "type": ["number", "null"] },
+        "net_to_client": { "type": ["number", "null"] },
+        "keep_amount": { "type": ["number", "null"], "description": "Ongoing entitlements client keeps in addition to settlement" },
+        "statutory_offer": { "type": ["number", "null"] },
+        "statutory_counteroffer": { "type": ["number", "null"] },
+        "settlement_offers": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": { "type": "string", "format": "date" },
+              "from": { "type": "string", "enum": ["plaintiff", "defendant", "insurer", "employer"] },
+              "amount": { "type": "number" },
+              "conditions": { "type": ["string", "null"], "description": "e.g., NDA required, Medicare deduction, keep entitlements" },
+              "response_deadline": { "type": ["string", "null"], "format": "date" },
+              "status": { "type": "string", "enum": ["pending", "accepted", "rejected", "expired", "countered"] }
+            }
+          }
+        },
+        "disbursements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "description": { "type": "string" },
+              "amount": { "type": "number" },
+              "date": { "type": ["string", "null"], "format": "date" },
+              "gst_applicable": { "type": "boolean", "default": true },
+              "paid": { "type": "boolean", "default": false }
+            }
+          }
+        }
+      }
+    },
+    "compliance": {
+      "type": "object",
+      "properties": {
+        "conflict_check_done": { "type": "boolean", "default": false },
+        "conflict_check_date": { "type": ["string", "null"], "format": "date" },
+        "conflict_check_result": { "type": ["string", "null"], "enum": [null, "clear", "flagged_proceed", "flagged_declined"] },
+        "costs_disclosure_sent": { "type": "boolean", "default": false },
+        "costs_disclosure_date": { "type": ["string", "null"], "format": "date" },
+        "costs_disclosure_updated": { "type": "boolean", "default": false },
+        "authority_to_release_signed": { "type": "boolean", "default": false },
+        "retainer_signed": { "type": "boolean", "default": false }
+      }
+    },
+    "notes": { "type": ["string", "null"] },
+    "import_notes": {
+      "type": ["string", "null"],
+      "description": "Raw notes from spreadsheet import — preserved for reference until manually reviewed"
+    }
   }
 }

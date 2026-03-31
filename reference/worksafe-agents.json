@@ -2,10 +2,10 @@
   "agents": [
     {"name":"Allianz","full_name":"Allianz Australia Workers' Compensation (Vic) Ltd","phone":"13 10 03","email":"worksafe.claims@allianz.com.au","address":"GPO Box 4049, Melbourne VIC 3001"},
     {"name":"CGU","full_name":"CGU Workers' Compensation (Vic) Ltd","phone":"13 24 81","email":"workerscomp.vic@cgu.com.au","address":"GPO Box 3999, Melbourne VIC 3001"},
+    {"name":"DXC","full_name":"DXC Technology (formerly Xchanging)","phone":"1300 763 766","email":"vic.claims@dxc.com","address":"GPO Box 4400, Melbourne VIC 3001"},
     {"name":"EML","full_name":"Employers Mutual Ltd","phone":"1800 365 888","email":"vic.claims@eml.com.au","address":"PO Box 539, Melbourne VIC 3001"},
     {"name":"Gallagher Bassett","full_name":"Gallagher Bassett Services","phone":"1800 774 377","email":"wc.vic@gbtpa.com.au","address":"GPO Box 1633, Melbourne VIC 3001"},
-    {"name":"QBE","full_name":"QBE Workers' Compensation (Vic) Ltd","phone":"03 9245 6789","email":"wc.claims.vic@qbe.com","address":"GPO Box 5100, Melbourne VIC 3001"},
-    {"name":"Xchanging","full_name":"Xchanging/DXC Technology","phone":"1300 763 766","email":"vic.claims@dxc.com","address":"GPO Box 4400, Melbourne VIC 3001"}
+    {"name":"QBE","full_name":"QBE Workers' Compensation (Vic) Ltd","phone":"03 9245 6789","email":"wc.claims.vic@qbe.com","address":"GPO Box 5100, Melbourne VIC 3001"}
   ],
-  "notes": "Verify periodically. Use /feedback to report incorrect details."
+  "notes": "Xchanging rebranded to DXC Technology. Verify periodically. Use /feedback to report incorrect details."
 }

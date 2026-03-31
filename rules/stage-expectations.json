@@ -1,7 +1,16 @@
 {
-  "version": "1.0",
+  "version": "2.0",
   "description": "Soft workflow expectations per stage. Miss = matter drifts, not claim destroyed.",
   "stages": {
+    "initial_review": {
+      "description": "Imported matter — needs initial review and data completion",
+      "expected_actions": [
+        { "action": "review_file", "description": "Review Smokeball file and update matter data", "expected_within_days": 90 },
+        { "action": "confirm_stage", "description": "Set correct stage based on current status", "expected_within_days": 90 }
+      ],
+      "suppress_alerts": true,
+      "alert_note": "Only surface in /all-matters and portfolio health, not in daily briefing"
+    },
     "intake": {
       "expected_actions": [
         { "action": "conflict_check", "description": "Run conflict check", "expected_within_days": 0 },
@@ -22,6 +31,7 @@
     "awaiting_insurer_decision": {
       "expected_actions": [
         { "action": "monitor_28_day", "description": "Track 28-day insurer decision deadline (WC)", "expected_within_days": 28, "applies_to": ["workcover"] },
+        { "action": "monitor_determination", "description": "Chase Comcare determination", "expected_within_days": 90, "applies_to": ["comcare"] },
         { "action": "client_update", "description": "Update client on progress", "expected_within_days": 14 }
       ],
       "auto_advance": { "to": "insurer_accepted OR insurer_rejected", "when": "insurer decision received" }
@@ -37,7 +47,8 @@
     "insurer_rejected": {
       "expected_actions": [
         { "action": "client_advice", "description": "Advise client of rejection and options", "expected_within_days": 3 },
-        { "action": "conciliation_decision", "description": "Decide on conciliation application", "expected_within_days": 14 },
+        { "action": "conciliation_decision", "description": "Decide on conciliation application", "expected_within_days": 14, "applies_to": ["workcover", "tac"] },
+        { "action": "reconsideration", "description": "Lodge s62 reconsideration", "expected_within_days": 21, "applies_to": ["comcare"] },
         { "action": "conciliation_application", "description": "Lodge conciliation application (60-day deadline)", "expected_within_days": 45, "applies_to": ["workcover"] }
       ],
       "auto_advance": { "to": "conciliation_pending", "when": "conciliation application filed" }
@@ -78,6 +89,17 @@
         { "action": "prepare_client", "description": "Prepare client for panel examination", "expected_within_days": 14 },
         { "action": "review_questions", "description": "Review panel questions and prepare submissions", "expected_within_days": 14 }
       ]
+    },
+    "common_law_pre_litigation": {
+      "description": "Serious injury certificate held or threshold met. Preparing to issue proceedings.",
+      "expected_actions": [
+        { "action": "comprehensive_medical", "description": "Obtain all outstanding medical evidence", "expected_within_days": 30 },
+        { "action": "quantum_assessment", "description": "Prepare quantum assessment / schedule of damages", "expected_within_days": 45 },
+        { "action": "liability_assessment", "description": "Assess liability position and evidence gaps", "expected_within_days": 30 },
+        { "action": "barrister_brief", "description": "Brief counsel to draft writ/SOC and advise", "expected_within_days": 60 },
+        { "action": "pre_litigation_steps", "description": "Complete pre-litigation steps (offers, notices, protocol conferences)", "expected_within_days": 90 }
+      ],
+      "auto_advance": { "to": "litigation", "when": "proceedings issued" }
     },
     "common_law_elected": {
       "expected_actions": [

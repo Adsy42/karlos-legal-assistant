@@ -1,5 +1,3 @@
-matters/
-!matters/.gitkeep
 logs/
 !logs/.gitkeep
 *.enc

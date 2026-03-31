@@ -1,6 +1,19 @@
 {
   "permissions": {
     "allow": ["Read(matters/**)", "Read(rules/**)", "Read(templates/**)", "Read(reference/**)", "Read(feedback/**)", "Write(matters/**)", "Write(feedback/**)", "Bash(git -C matters/ *)", "Bash(pdftotext *)", "Bash(python3 *)"],
-    "deny": ["Bash(rm -rf *)", "Bash(git push *)", "Write(rules/**)", "Write(templates/**)", "Write(CLAUDE.md)"]
+    "deny": ["Bash(rm -rf *)", "Write(rules/**)", "Write(templates/**)", "Write(CLAUDE.md)"]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/auto-track.sh"
+          }
+        ]
+      }
+    ]
   }
 }
